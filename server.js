@@ -5,13 +5,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ This reads the key you saved in Render's Environment Variables
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY; 
+// ✅ DEEPSEEK API SETUP
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+const DEEPSEEK_URL = "https://api.deepseek.com/chat/completions";
 
-if (!GEMINI_API_KEY) {
-  console.error("❌ ERROR: GEMINI_API_KEY is missing from Render Environment Variables!");
+if (!DEEPSEEK_API_KEY) {
+  console.error("❌ ERROR: DEEPSEEK_API_KEY is missing from Render Environment Variables!");
 }
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GEMINI_API_KEY}`;
+
 app.post('/api/generate-exam', async (req, res) => {
   const { schemeText, w1, w2 } = req.body;
   if (!schemeText) return res.status(400).json({ error: "No scheme provided." });
@@ -19,50 +20,65 @@ app.post('/api/generate-exam', async (req, res) => {
   const prompt = `You are a strict school teacher. Scheme of work: "${schemeText}". Generate exactly 5 multiple choice questions covering ONLY topics between Week ${w1} and Week ${w2}. Return ONLY a JSON array: [{"question": "...", "options": ["A","B","C","D"], "answer": 0}] Where "answer" is the index (0 to 3).`;
 
   try {
-    const response = await fetch(GEMINI_URL, {
+    const response = await fetch(DEEPSEEK_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "deepseek-chat",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7
+      })
     });
+    
     const data = await response.json();
     
-    // Show exact error if Google rejects it
     if (data.error) {
-      console.error("GOOGLE ERROR:", data.error.message);
       return res.status(500).json({ error: data.error.message });
     }
 
-    let aiText = data.candidates[0].content.parts[0].text;
+    let aiText = data.choices[0].message.content;
     aiText = aiText.replace(/```json/g, "").replace(/```/g, "").trim();
     res.json({ questions: JSON.parse(aiText) });
   } catch (error) {
     console.error("EXAM ERROR:", error);
-    res.status(500).json({ error: "AI failed to generate. Check logs." });
+    res.status(500).json({ error: "AI failed to generate." });
   }
 });
 
 app.post('/api/chat', async (req, res) => {
   const { message } = req.body;
+  
   try {
-    const response = await fetch(GEMINI_URL, {
+    const response = await fetch(DEEPSEEK_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ parts: [{ text: `You are a helpful school tutor. Keep it simple. Student asks: ${message}` }] }] })
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "deepseek-chat",
+        messages: [
+          { role: "system", content: "You are a helpful, encouraging school tutor for students. Keep explanations simple, clear, and educational." },
+          { role: "user", content: message }
+        ]
+      })
     });
+    
     const data = await response.json();
     
-    // Show exact error if Google rejects it
     if (data.error) {
-      console.error("GOOGLE ERROR:", data.error.message);
       return res.status(500).json({ error: data.error.message });
     }
 
-    res.json({ reply: data.candidates[0].content.parts[0].text });
+    res.json({ reply: data.choices[0].message.content });
   } catch (error) {
     console.error("CHAT ERROR:", error);
-    res.status(500).json({ error: "AI failed to respond. Check logs." });
+    res.status(500).json({ error: "AI failed to respond." });
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('Server running'));
+app.listen(PORT, () => console.log('Server running with DeepSeek'));
