@@ -61,7 +61,7 @@ app.post('/api/chat', async (req, res) => {
       body: JSON.stringify({
         model:  "openai/gpt-oss-120b",
         messages: [
-          { role: "system", content: "You are a helpful, encouraging school tutor for students. Keep explanations simple, clear, and educational." },
+          { role: "system", content: "You are a helpful school tutor. Keep explanations simple and clear. Do NOT use markdown, asterisks, or tables. Use plain text only." }
           { role: "user", content: message }
         ]
       })
