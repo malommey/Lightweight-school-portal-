@@ -27,7 +27,7 @@ app.post('/api/generate-exam', async (req, res) => {
         "Authorization": `Bearer ${GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: "llama-3.1-70b-versatile", // Groq's fast and smart model
+        model: "openai/gpt-oss-120b", // Groq's fast and smart model
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7
       })
