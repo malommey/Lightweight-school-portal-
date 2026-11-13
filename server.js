@@ -59,7 +59,7 @@ app.post('/api/chat', async (req, res) => {
         "Authorization": `Bearer ${GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: "llama-3.1-70b-versatile",
+        model:  "openai/gpt-oss-120b",
         messages: [
           { role: "system", content: "You are a helpful, encouraging school tutor for students. Keep explanations simple, clear, and educational." },
           { role: "user", content: message }
