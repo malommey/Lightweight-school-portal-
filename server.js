@@ -11,7 +11,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 if (!GEMINI_API_KEY) {
   console.error("❌ ERROR: GEMINI_API_KEY is missing from Render Environment Variables!");
 }
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GEMINI_API_KEY}`;
 app.post('/api/generate-exam', async (req, res) => {
   const { schemeText, w1, w2 } = req.body;
   if (!schemeText) return res.status(400).json({ error: "No scheme provided." });
