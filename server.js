@@ -5,12 +5,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ DEEPSEEK API SETUP
-const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
-const DEEPSEEK_URL = "https://api.deepseek.com/chat/completions";
+// ✅ GROQ API SETUP
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-if (!DEEPSEEK_API_KEY) {
-  console.error("❌ ERROR: DEEPSEEK_API_KEY is missing from Render Environment Variables!");
+if (!GROQ_API_KEY) {
+  console.error("❌ ERROR: GROQ_API_KEY is missing from Render Environment Variables!");
 }
 
 app.post('/api/generate-exam', async (req, res) => {
@@ -20,14 +20,14 @@ app.post('/api/generate-exam', async (req, res) => {
   const prompt = `You are a strict school teacher. Scheme of work: "${schemeText}". Generate exactly 5 multiple choice questions covering ONLY topics between Week ${w1} and Week ${w2}. Return ONLY a JSON array: [{"question": "...", "options": ["A","B","C","D"], "answer": 0}] Where "answer" is the index (0 to 3).`;
 
   try {
-    const response = await fetch(DEEPSEEK_URL, {
+    const response = await fetch(GROQ_URL, {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
+        "Authorization": `Bearer ${GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: "deepseek-chat",
+        model: "llama-3.1-70b-versatile", // Groq's fast and smart model
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7
       })
@@ -52,14 +52,14 @@ app.post('/api/chat', async (req, res) => {
   const { message } = req.body;
   
   try {
-    const response = await fetch(DEEPSEEK_URL, {
+    const response = await fetch(GROQ_URL, {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
+        "Authorization": `Bearer ${GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: "deepseek-chat",
+        model: "llama-3.1-70b-versatile",
         messages: [
           { role: "system", content: "You are a helpful, encouraging school tutor for students. Keep explanations simple, clear, and educational." },
           { role: "user", content: message }
@@ -81,4 +81,4 @@ app.post('/api/chat', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('Server running with DeepSeek'));
+app.listen(PORT, () => console.log('Server running with Groq'));
