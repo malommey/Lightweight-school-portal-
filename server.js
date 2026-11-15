@@ -39,7 +39,7 @@ app.post('/api/generate-exam', async (req, res) => {
         "Authorization": `Bearer ${GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: imageBase64 ? "llama-3.2-90b-vision-preview" : "openai/gpt-oss-120b",// Use vision model if image exists
+                model: imageBase64 ? "qwen/qwen3.6-27b" : "openai/gpt-oss-120b",
         messages: [{ role: "user", content: messageContent }],
         temperature: 0.7
       })
