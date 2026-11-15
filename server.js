@@ -27,7 +27,7 @@ app.post('/api/generate-exam', async (req, res) => {
       const base64Data = imageBase64.split(',')[1]; // Remove the data:image/jpeg;base64, prefix
       const mimeType = imageBase64.split(';')[0].split(':')[1];
 
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GEMINI_API_KEY}`;
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`;
       const response = await fetch(geminiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
