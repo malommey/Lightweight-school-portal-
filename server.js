@@ -98,9 +98,8 @@ app.post('/api/chat', async (req, res) => {
 
     res.json({ reply: data.choices[0].message.content });
   } catch (error) {
-    res.status(500).json({ error: "AI failed to respond." });
+    res.status(500).json({ error: "AI failed to respond. Check server logs." });
   }
 });
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log('Server running with Groq and Gemini'));
